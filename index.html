@@ -36,11 +36,6 @@
       <button class="update-notif-close" onclick="document.getElementById('updateNotifBanner').style.display='none'">×</button>
     </div>
 
-    <div class="update-banner" id="updateBanner">
-      <span>🆕 <b>อัปเดต 9 ก.ค.</b> — Login ด้วย Discord ได้แล้ว · คัดลอกข้อมูลทีมส่งในกิลด์ได้ง่ายขึ้น · <a href="https://docs.google.com/document/d/1vCyPgkV5OcIlSyMt_QIMUHqE_qYCsNqF0-7tK4OCtSk/edit?tab=t.0" target="_blank" rel="noopener">และอื่นๆ →</a></span>
-      <button class="close-banner" id="closeBanner" title="ปิด">×</button>
-    </div>
-
     <!-- GATE VIEW -->
     <section id="gateView" style="display:none;">
       <div class="gate-box">
@@ -175,40 +170,6 @@
   <div id="paletteDock" class="palette-dock" style="display:none;"></div>
   <div class="toast" id="toast"></div>
   <div id="discordWatermark" class="discord-watermark" style="display:none;"></div>
-
-  <button class="contact-fab" id="contactFab" title="ติดต่อ BRAV0">
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="currentColor">
-      <path d="M12 2C6.477 2 2 6.268 2 11.5c0 2.709 1.177 5.148 3.073 6.89L4 22l4.23-1.763C9.374 20.71 10.666 21 12 21c5.523 0 10-4.268 10-9.5S17.523 2 12 2z"/>
-    </svg>
-  </button>
-
-  <div class="modal-overlay" id="contactModal">
-    <div class="modal-box contact-modal-box">
-      <div class="contact-modal-header">
-        <div>
-          <div class="contact-modal-title">ติดต่อ BRAV0</div>
-          <div class="contact-modal-sub">ข้อความจะถูกส่งผ่านแอปอีเมลของคุณ</div>
-        </div>
-        <button class="dp-close-btn" id="closeContactModal" type="button">×</button>
-      </div>
-      <div class="field">
-        <label>ชื่อของคุณ / IGN</label>
-        <input type="text" id="contactName" placeholder="เช่น Knight123">
-      </div>
-      <div class="field">
-        <label>เรื่อง <span style="font-weight:400;color:var(--muted)">(ไม่บังคับ)</span></label>
-        <input type="text" id="contactSubject" placeholder="เช่น ข้อเสนอแนะ, แจ้งปัญหา...">
-      </div>
-      <div class="field">
-        <label>ข้อความ</label>
-        <textarea id="contactMessage" rows="4" placeholder="พิมพ์ข้อความของคุณที่นี่..."></textarea>
-      </div>
-      <div class="btn-group" style="margin-top:18px;justify-content:flex-end;">
-        <button class="btn" id="contactCancel" type="button">ยกเลิก</button>
-        <button class="btn btn-primary" id="contactSend" type="button" disabled>ส่งข้อความ</button>
-      </div>
-    </div>
-  </div>
 
   <div class="modal-overlay" id="copyCounterModal">
     <div class="modal-box">
