@@ -48,13 +48,18 @@ const HERO_TIERS = [
   },
 ];
 
+const assetPath = (...parts) => parts
+  .flatMap((part) => String(part).split("/"))
+  .map(encodeURIComponent)
+  .join("/");
+
 const HEROES = HERO_TIERS.flatMap(({ tier, label, folder, names }) =>
   names.map((name) => ({
     id: name,
     name,
     tier,
     tierLabel: label,
-    img: `public/images/${folder}/${name}.png`,
+    img: assetPath("public/images", folder, `${name}.png`),
   }))
 );
 
