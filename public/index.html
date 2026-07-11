@@ -3,6 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script>
+    (function () {
+      var workerOrigin = "https://guild-auth-worker.deadchicken07.workers.dev";
+      if (location.origin !== workerOrigin) {
+        location.replace(workerOrigin + location.pathname + location.search + location.hash);
+      }
+    })();
+  </script>
   <meta name="build-time" content="09/07/2026 01:54" />
   <title>PokkyRebirth Guild War Hub - วางแผนทีมตี Guild War</title>
   <link rel="icon" href="images/SevenKnight.png" />
