@@ -35,8 +35,7 @@ const ListView = {
     const wrap = document.getElementById("filterPills");
     const catPills = [{ id: "all", label: "ทั้งหมด" }, ...CATEGORIES];
     const guildPills = [
-      { id: "ICONYX",  label: "ICONYX"  },
-      { id: "LEGENDS", label: "LEGENDS" },
+      { id: "PokkyRebirth", label: "PokkyRebirth" },
     ];
     wrap.innerHTML =
       catPills.map((c) =>

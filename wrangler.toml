@@ -1,0 +1,26 @@
+name = "pokky-guild-hub"
+compatibility_date = "2024-01-01"
+pages_build_output_dir = "."
+
+# ── D1 binding ─────────────────────────────────────────────────────────────
+# ต้องตรงกับ D1 database ที่ Worker (guild-auth-worker) ใช้อยู่
+[[d1_databases]]
+binding       = "DB"
+database_name = "guild-sessions"
+database_id   = "YOUR_D1_DATABASE_ID"   # wrangler d1 list → copy id มาใส่
+
+# ── Environment variables ──────────────────────────────────────────────────
+# ตั้งค่าใน Cloudflare Pages Dashboard → Settings → Environment variables
+#
+# ชื่อ env var ต้องตรงกับที่ตั้งไว้ใน Dashboard:
+#
+#   DISCORD_CLIENT_ID     = 1525475797199224923   (ใช้ใน /auth/discord redirect)
+#   DISCORD_REDIRECT_URI  = https://guild-auth-worker.deadchicken07.workers.dev/auth/callback
+#
+# หมายเหตุ:
+#   - DISCORD_CLIENT_SECRET และ DISCORD_BOT_TOKEN ไม่จำเป็นสำหรับ Pages Functions
+#     เพราะ Worker (guild-auth-worker) จัดการ OAuth callback และสร้าง session ใน D1 เอง
+#   - Pages Functions แค่อ่าน session จาก D1 และ validate sid cookie
+#
+#   - ADMIN_ROLE_IDS ต้องตั้งที่ Worker ไม่ใช่ที่นี่
+#     (Worker คือตัวที่ fetch role IDs และ set role ลง D1)

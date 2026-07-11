@@ -40,7 +40,7 @@ body {
       rgba(255, 255, 255, 0.72),
       rgba(238, 246, 252, 0.8)
     ),
-    url("../public/bg/bg_Kris.png"),
+    url("../public/bg/bg_rudy.png"),
     url("../public/bg/bg_Mel.png"),
     url("../public/bg/bg_sky.png");
   background-size: cover, 900px auto, 780px auto, cover;
@@ -58,7 +58,7 @@ html.dark body {
       rgba(11, 20, 48, 0.55),
       rgba(11, 20, 48, 0.85)
     ),
-    url("../public/bg/bg_Kris.png"),
+    url("../public/bg/bg_rudy.png"),
     url("../public/bg/bg_Mel.png"),
     url("../public/bg/bg_sky.png");
 }
@@ -365,16 +365,9 @@ textarea {
   white-space: nowrap;
 }
 
-.pill-guild-legends { color: #9333ea; border-color: rgba(147, 51, 234, 0.35); }
-.pill-guild-legends.active {
-  background: linear-gradient(135deg, #7c3aed, #a855f7);
-  border-color: transparent;
-  color: #fff;
-}
-
-.pill-guild-iconyx { color: #0891b2; border-color: rgba(8, 145, 178, 0.35); }
-.pill-guild-iconyx.active {
-  background: linear-gradient(135deg, #0891b2, #06b6d4);
+.pill-guild-pokkyrebirth { color: #e85d04; border-color: rgba(232, 93, 4, 0.35); }
+.pill-guild-pokkyrebirth.active {
+  background: linear-gradient(135deg, #e85d04, #f48c06);
   border-color: transparent;
   color: #fff;
 }
@@ -445,14 +438,9 @@ textarea {
   color: #fff;
 }
 
-.badge-guild-legends {
-  background: linear-gradient(135deg, #7c3aed, #a855f7);
-  box-shadow: 0 1px 6px rgba(124, 58, 237, 0.45);
-}
-
-.badge-guild-iconyx {
-  background: linear-gradient(135deg, #0891b2, #06b6d4);
-  box-shadow: 0 1px 6px rgba(8, 145, 178, 0.45);
+.badge-guild-pokkyrebirth {
+  background: linear-gradient(135deg, #e85d04, #f48c06);
+  box-shadow: 0 1px 6px rgba(232, 93, 4, 0.45);
 }
 
 .team-card-body {

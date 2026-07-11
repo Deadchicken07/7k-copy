@@ -26,8 +26,8 @@ const ADMIN_GUILD_KEY   = "7kcombo_admin_guild";
 
 // Maps admin code (lowercase) → guild badge label shown on team cards.
 const ADMIN_GUILD_MAP = {
-  "lgnd_admin": "LEGENDS",
-  "icyx_admin": "ICONYX",
+  "lgnd_admin": "PokkyRebirth",
+  "icyx_admin": "PokkyRebirth",
 };
 
 const Auth = {

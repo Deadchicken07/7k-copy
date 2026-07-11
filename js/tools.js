@@ -72,7 +72,7 @@ const AdminTools = {
 
     document.getElementById("lineMessageBtn").addEventListener("click", () => {
       const msg =
-        `🛡️ ICONYX & LEGENDS Guild War Hub\n` +
+        `🛡️ PokkyRebirth Guild War Hub\n` +
         `📅 ${today.date}\n` +
         `🔑 รหัสสมาชิก: ${today.code}\n\n` +
         `นำรหัสนี้ไปกรอกที่หน้าเว็บเพื่อเข้าดูทีมที่แนะนำ\n` +

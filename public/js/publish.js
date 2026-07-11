@@ -1,4 +1,4 @@
-const GH_REPO   = "prapawitb/guild-war-hub";
+const GH_REPO   = "Deadchicken07/7k-copy";
 const GH_FILE   = "data/teams.json";
 const GH_BRANCH = window.location.hostname.startsWith("staging.") ? "staging" : "main";
 const GH_TOKEN  = "";

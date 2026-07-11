@@ -231,9 +231,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const subject = document.getElementById("contactSubject").value.trim();
     const message = document.getElementById("contactMessage").value.trim();
     if (!message) { toast("กรุณาพิมพ์ข้อความก่อนส่ง"); return; }
-    const sub  = subject || "ข้อความจากเว็บ ICONYX & LEGENDS Guild War Hub";
-    const body = (name ? `จาก: ${name}\n\n` : "") + message;
-    window.location.href = `mailto:prapawit.bum@gmail.com?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
+    toast("Contact email is disabled.");
     closeContact();
   });
 });

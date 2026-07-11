@@ -4,6 +4,7 @@ const App = {
   async init() {
     this.initTheme();
     this.initBanner();
+    Auth.initCookieRole();
     await Auth.initDiscord();
     await Store.load();
 
@@ -39,7 +40,7 @@ const App = {
     }
 
     document.getElementById("gateLoginBtn").addEventListener("click", () => {
-      Auth.promptGuildLogin(() => { this.bootApp(); this.showWatermark(); });
+      window.location.href = "/auth/discord";
     });
   },
 
@@ -103,10 +104,12 @@ const App = {
 
   initBanner() {
     const banner = document.getElementById("updateBanner");
+    const closeBtn = document.getElementById("closeBanner");
+    if (!banner || !closeBtn) return;
     if (localStorage.getItem("7kcombo_banner_closed") === "1") {
       banner.style.display = "none";
     }
-    document.getElementById("closeBanner").addEventListener("click", () => {
+    closeBtn.addEventListener("click", () => {
       banner.style.display = "none";
       localStorage.setItem("7kcombo_banner_closed", "1");
     });
@@ -124,11 +127,7 @@ const App = {
       this.showAdmin();
       return;
     }
-    // Not admin: toast warning then prompt admin login
-    if (Auth.isGuildMember()) {
-      toast("โหมดแก้ไขสำหรับผู้ดูแลเท่านั้น");
-    }
-    Auth.promptLogin(() => this.showAdmin());
+    toast("โหมดแก้ไขสำหรับผู้ดูแลเท่านั้น");
   },
 
   // Leaving admin mode (via the editToggle icon or the "กลับหน้าหลัก"
@@ -210,30 +209,30 @@ document.addEventListener("DOMContentLoaded", () => {
   const cancelBtn  = document.getElementById("contactCancel");
   const sendBtn    = document.getElementById("contactSend");
 
-  const openContact  = () => { modal.classList.add("open"); setTimeout(() => document.getElementById("contactName").focus(), 60); };
-  const closeContact = () => modal.classList.remove("open");
+  if (fab && modal && closeBtn && cancelBtn && sendBtn) {
+    const openContact  = () => { modal.classList.add("open"); setTimeout(() => document.getElementById("contactName").focus(), 60); };
+    const closeContact = () => modal.classList.remove("open");
 
-  const nameInput = document.getElementById("contactName");
-  const msgInput  = document.getElementById("contactMessage");
-  const checkReady = () => {
-    sendBtn.disabled = !nameInput.value.trim() || !msgInput.value.trim();
-  };
-  nameInput.addEventListener("input", checkReady);
-  msgInput.addEventListener("input", checkReady);
+    const nameInput = document.getElementById("contactName");
+    const msgInput  = document.getElementById("contactMessage");
+    const checkReady = () => {
+      sendBtn.disabled = !nameInput.value.trim() || !msgInput.value.trim();
+    };
+    nameInput.addEventListener("input", checkReady);
+    msgInput.addEventListener("input", checkReady);
 
-  fab.addEventListener("click", openContact);
-  closeBtn.addEventListener("click", closeContact);
-  cancelBtn.addEventListener("click", closeContact);
-  modal.addEventListener("click", (e) => { if (e.target === modal) closeContact(); });
+    fab.addEventListener("click", openContact);
+    closeBtn.addEventListener("click", closeContact);
+    cancelBtn.addEventListener("click", closeContact);
+    modal.addEventListener("click", (e) => { if (e.target === modal) closeContact(); });
 
-  sendBtn.addEventListener("click", () => {
-    const name    = document.getElementById("contactName").value.trim();
-    const subject = document.getElementById("contactSubject").value.trim();
-    const message = document.getElementById("contactMessage").value.trim();
-    if (!message) { toast("กรุณาพิมพ์ข้อความก่อนส่ง"); return; }
-    const sub  = subject || "ข้อความจากเว็บ ICONYX & LEGENDS Guild War Hub";
-    const body = (name ? `จาก: ${name}\n\n` : "") + message;
-    window.location.href = `mailto:prapawit.bum@gmail.com?subject=${encodeURIComponent(sub)}&body=${encodeURIComponent(body)}`;
-    closeContact();
-  });
+    sendBtn.addEventListener("click", () => {
+      const name    = document.getElementById("contactName").value.trim();
+      const subject = document.getElementById("contactSubject").value.trim();
+      const message = document.getElementById("contactMessage").value.trim();
+      if (!message) { toast("กรุณาพิมพ์ข้อความก่อนส่ง"); return; }
+      toast("Contact email is disabled.");
+      closeContact();
+    });
+  }
 });
