@@ -6,8 +6,8 @@ pages_build_output_dir = "."
 # ต้องตรงกับ D1 database ที่ Worker (guild-auth-worker) ใช้อยู่
 [[d1_databases]]
 binding       = "DB"
-database_name = "guild-sessions"
-database_id   = "YOUR_D1_DATABASE_ID"   # wrangler d1 list → copy id มาใส่
+database_name = "guild-auth"
+database_id   = "0c19c5fc-8c9d-4195-9a89-e32ec4a37daf"
 
 # ── Environment variables ──────────────────────────────────────────────────
 # ตั้งค่าใน Cloudflare Pages Dashboard → Settings → Environment variables
