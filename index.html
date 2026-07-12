@@ -84,6 +84,13 @@
 
     <!-- ADMIN VIEW -->
     <section id="adminView" style="display:none;">
+      <button class="admin-sidebar-toggle" id="adminSidebarToggle" type="button" aria-label="Toggle admin menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="admin-layout">
+        <aside class="admin-sidebar" id="adminSidebar" aria-hidden="true">
+          <div class="admin-sidebar-title">Admin Menu</div>
+          <div class="admin-sidebar-actions">
       <div class="admin-bar">
         <span class="admin-title">โหมดแก้ไข (Admin)</span>
         <div class="btn-group">
@@ -98,9 +105,14 @@
           </button>
         </div>
       </div>
+          </div>
+        </aside>
+        <div class="admin-main">
       <p class="hint" id="adminHint">ข้อมูลที่แก้ไขจะถูกบันทึกอัตโนมัติเป็นฉบับร่างในเบราว์เซอร์นี้ กด "ยืนยันการบันทึกข้อมูลทั้งหมด" เพื่อเผยแพร่ขึ้นเว็บจริงทันที</p>
       <div id="adminTeamList" class="admin-team-list"></div>
       <div id="editorPanel"></div>
+        </div>
+      </div>
     </section>
   </div>
 

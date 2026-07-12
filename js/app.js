@@ -66,6 +66,10 @@ const App = {
     this.startPolling();
     document.getElementById("editToggle").addEventListener("click", () => this.onEditToggle());
     document.getElementById("toolsToggle").addEventListener("click", () => this.showTools());
+    const adminSidebarToggle = document.getElementById("adminSidebarToggle");
+    if (adminSidebarToggle) {
+      adminSidebarToggle.addEventListener("click", () => this.toggleAdminSidebar());
+    }
     document.getElementById("closeLineModal").addEventListener("click", () =>
       document.getElementById("lineModal").classList.remove("open")
     );
@@ -153,11 +157,13 @@ const App = {
     document.getElementById("adminView").style.display = "block";
     AdminEditor.tab = ListView.state.tab;
     AdminEditor.renderTeamList();
+    this.toggleAdminSidebar(false);
     this.applyAdminUi();
   },
 
   showList() {
     ListView.state.tab = AdminEditor.tab;
+    this.toggleAdminSidebar(false);
     AdminEditor.closeEditor();
     document.getElementById("adminView").style.display = "none";
     document.getElementById("detailView").style.display = "none";
@@ -170,12 +176,28 @@ const App = {
   },
 
   showTools() {
+    this.toggleAdminSidebar(false);
     document.getElementById("listView").style.display = "none";
     document.getElementById("adminView").style.display = "none";
     document.getElementById("detailView").style.display = "none";
     document.getElementById("toolsView").style.display = "block";
     AdminTools.render();
     this.applyAdminUi();
+  },
+
+  toggleAdminSidebar(forceOpen) {
+    const adminView = document.getElementById("adminView");
+    const toggle = document.getElementById("adminSidebarToggle");
+    const sidebar = document.getElementById("adminSidebar");
+    if (!adminView || !toggle || !sidebar) return;
+
+    const willOpen = typeof forceOpen === "boolean"
+      ? forceOpen
+      : !adminView.classList.contains("admin-sidebar-open");
+
+    adminView.classList.toggle("admin-sidebar-open", willOpen);
+    toggle.setAttribute("aria-expanded", String(willOpen));
+    sidebar.setAttribute("aria-hidden", String(!willOpen));
   },
 
   applyAdminUi() {

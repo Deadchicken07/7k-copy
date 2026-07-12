@@ -812,6 +812,121 @@ span.slot-dot.dot-greyed:hover { border-color: #374151; color: #374151; }
   font-weight: 800;
 }
 
+#adminView {
+  position: relative;
+  padding-top: 4px;
+}
+
+.admin-sidebar-toggle {
+  position: sticky;
+  top: 12px;
+  left: 0;
+  z-index: 520;
+  width: 42px;
+  height: 42px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--card-bg);
+  color: var(--text);
+  box-shadow: var(--shadow);
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  cursor: pointer;
+}
+
+.admin-sidebar-toggle span {
+  width: 20px;
+  height: 2px;
+  border-radius: 999px;
+  background: currentColor;
+  transition: transform 0.18s ease, opacity 0.18s ease;
+}
+
+.admin-sidebar-open .admin-sidebar-toggle span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+.admin-sidebar-open .admin-sidebar-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+.admin-sidebar-open .admin-sidebar-toggle span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+.admin-layout {
+  display: block;
+}
+
+.admin-sidebar {
+  position: fixed;
+  top: 84px;
+  bottom: 18px;
+  left: 18px;
+  z-index: 500;
+  width: min(300px, calc(100vw - 36px));
+  padding: 16px;
+  border: 1px solid var(--card-border);
+  border-radius: 12px;
+  background: var(--card-bg);
+  box-shadow: 0 18px 48px rgba(15, 23, 42, 0.22);
+  overflow-y: auto;
+  transform: translateX(calc(-100% - 28px));
+  transition: transform 0.22s ease;
+}
+
+.admin-sidebar-open .admin-sidebar {
+  transform: translateX(0);
+}
+
+.admin-sidebar-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--muted);
+  margin-bottom: 12px;
+  text-transform: uppercase;
+}
+
+.admin-sidebar .admin-bar {
+  display: block;
+  margin-bottom: 0;
+}
+
+.admin-sidebar .admin-title {
+  display: block;
+  margin-bottom: 12px;
+  line-height: 1.25;
+}
+
+.admin-sidebar .btn-group,
+.admin-sidebar-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.admin-sidebar .btn {
+  width: 100%;
+  justify-content: center;
+}
+
+.admin-main {
+  transition: margin-left 0.22s ease;
+}
+
+.admin-sidebar-open .admin-main {
+  margin-left: 318px;
+}
+
+@media (max-width: 860px) {
+  .admin-sidebar-open .admin-main {
+    margin-left: 0;
+  }
+}
+
 .btn {
   border: 1px solid var(--card-border);
   background: var(--card-bg);
