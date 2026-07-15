@@ -1,2 +1,7 @@
 dist/
 .vercel/
+node_modules/
+.next/
+out/
+.dev.vars
+.wrangler/

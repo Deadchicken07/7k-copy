@@ -62,12 +62,17 @@ const App = {
     document.getElementById("listView").style.display = "block";
     ListView.mount();
     AdminEditor.mount();
+    if (typeof ImageFolderChecker !== "undefined") ImageFolderChecker.mount();
     this.startPolling();
     document.getElementById("editToggle").addEventListener("click", () => this.onEditToggle());
     document.getElementById("toolsToggle").addEventListener("click", () => this.showTools());
     const adminSidebarToggle = document.getElementById("adminSidebarToggle");
     if (adminSidebarToggle) {
       adminSidebarToggle.addEventListener("click", () => this.toggleAdminSidebar());
+    }
+    const sidebarTeamsBtn = document.getElementById("sidebarTeamsBtn");
+    if (sidebarTeamsBtn) {
+      sidebarTeamsBtn.addEventListener("click", () => this.focusAdminTeams());
     }
     document.getElementById("closeLineModal").addEventListener("click", () =>
       document.getElementById("lineModal").classList.remove("open")
@@ -158,6 +163,8 @@ const App = {
     document.getElementById("adminView").style.display = "block";
     AdminEditor.tab = ListView.state.tab;
     AdminEditor.renderTeamList();
+    this.renderSidebarOverview();
+    if (typeof ImageFolderChecker !== "undefined") ImageFolderChecker.mount();
     this.toggleAdminSidebar(false);
     this.applyAdminUi();
   },
@@ -186,6 +193,52 @@ const App = {
     this.applyAdminUi();
   },
 
+  focusAdminTeams() {
+    const list = document.getElementById("adminTeamList");
+    if (!list) return;
+    list.scrollIntoView({ behavior: "smooth", block: "start" });
+  },
+  renderSidebarOverview() {
+    const container = document.getElementById("sidebarOverviewContent");
+    if (!container) return;
+
+    const teams = typeof Store?.getTeams === "function" ? Store.getTeams() : [];
+    const currentTab = AdminEditor?.tab || "attack";
+    const tabLabel = (typeof TEAM_TABS !== "undefined"
+      ? TEAM_TABS.find((tab) => tab.id === currentTab)?.label
+      : "") || currentTab;
+    const visibleTeams = teams.filter((team) => !team.hidden).length;
+    const hiddenTeams = teams.length - visibleTeams;
+    const counterCount = teams.reduce((sum, team) => sum + ((team.counters || []).length), 0);
+
+    container.innerHTML = `
+      <div class="sidebar-overview-grid">
+        <div class="sidebar-stat">
+          <span>ทีมทั้งหมด</span>
+          <b>${teams.length}</b>
+        </div>
+        <div class="sidebar-stat">
+          <span>แสดงอยู่</span>
+          <b>${visibleTeams}</b>
+        </div>
+        <div class="sidebar-stat">
+          <span>ซ่อนไว้</span>
+          <b>${hiddenTeams}</b>
+        </div>
+        <div class="sidebar-stat">
+          <span>ทีมแก้</span>
+          <b>${counterCount}</b>
+        </div>
+      </div>
+      <div class="admin-sidebar-meta">หมวดที่กำลังแก้: ${tabLabel}</div>
+    `;
+
+    const summary = document.getElementById("sidebarTeamSummary");
+    if (summary) {
+      summary.textContent = `${teams.length} ทีมทั้งหมด · ${visibleTeams} ทีมที่แสดง`;
+    }
+  },
+
   toggleAdminSidebar(forceOpen) {
     const adminView = document.getElementById("adminView");
     const toggle = document.getElementById("adminSidebarToggle");
@@ -203,8 +256,10 @@ const App = {
 
   applyAdminUi() {
     const inAdmin = document.getElementById("adminView").style.display !== "none";
+    const isAdmin = Auth.isAdmin();
     document.getElementById("editToggle").classList.toggle("active", inAdmin);
-    document.getElementById("toolsToggle").style.display = Auth.isAdmin() ? "" : "none";
+    document.getElementById("adminSidebarToggle").style.display = isAdmin ? "" : "none";
+    document.getElementById("toolsToggle").style.display = isAdmin ? "" : "none";
   },
 
   startPolling() {

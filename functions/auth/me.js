@@ -1,6 +1,5 @@
 // GET /auth/me
-// Returns the current session info for client-side auth.js (Auth.initDiscord)
-// Expected shape: { loggedIn, isAdmin, isMember, displayName }
+// Returns the current session info for the client-side AuthGate.
 
 const SESSION_COOKIE = "sid";
 
@@ -17,11 +16,30 @@ function parseCookies(request) {
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" },
   });
 }
 
+async function ensureSessionsTable(env) {
+  await env.DB.prepare(`
+    CREATE TABLE IF NOT EXISTS sessions (
+      sid          TEXT    PRIMARY KEY,
+      discord_id   TEXT    NOT NULL,
+      username     TEXT    NOT NULL,
+      display_name TEXT    NOT NULL,
+      is_member    INTEGER NOT NULL DEFAULT 1,
+      role         TEXT    NOT NULL DEFAULT 'user',
+      expires_at   INTEGER NOT NULL,
+      created_at   INTEGER NOT NULL DEFAULT (unixepoch())
+    )
+  `).run();
+  await env.DB.prepare(`CREATE INDEX IF NOT EXISTS idx_sessions_expires ON sessions (expires_at)`).run();
+}
+
 export async function onRequestGet({ request, env }) {
+  if (!env.DB) return json({ loggedIn: false, error: "missing DB binding" }, 500);
+  await ensureSessionsTable(env);
+
   const sid = parseCookies(request)[SESSION_COOKIE];
   if (!sid) return json({ loggedIn: false });
 
@@ -35,9 +53,9 @@ export async function onRequestGet({ request, env }) {
   if (!session) return json({ loggedIn: false });
 
   return json({
-    loggedIn:    true,
-    isAdmin:     session.role === "admin",
-    isMember:    session.is_member === 1,
+    loggedIn: true,
+    isAdmin: session.role === "admin",
+    isMember: session.is_member === 1,
     displayName: session.display_name,
   });
 }

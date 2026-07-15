@@ -22,6 +22,10 @@ const App = {
     } else {
       this.bootApp();
       this.showWatermark();
+      if (Auth.isAdmin()) {
+        this.toggleAdminSidebar(true);
+        this.setActiveNav("exitAdminBtn");
+      }
     }
   },
 
@@ -63,13 +67,22 @@ const App = {
     document.getElementById("listView").style.display = "block";
     ListView.mount();
     AdminEditor.mount();
+    if (typeof ImageFolderChecker !== "undefined") ImageFolderChecker.mount();
     this.startPolling();
     document.getElementById("editToggle").addEventListener("click", () => this.onEditToggle());
-    document.getElementById("toolsToggle").addEventListener("click", () => this.showTools());
+    document.getElementById("toolsToggle")?.addEventListener("click", () => this.showTools());
     const adminSidebarToggle = document.getElementById("adminSidebarToggle");
     if (adminSidebarToggle) {
       adminSidebarToggle.addEventListener("click", () => this.toggleAdminSidebar());
     }
+    document.getElementById("sidebarTeamsBtn")?.addEventListener("click", () => {
+      this.showAdmin();
+    });
+    // capture=true → fires before editor.js so adminView is visible when startNew() runs
+    document.getElementById("addTeamBtn")?.addEventListener("click", () => {
+      this.showAdmin();
+      this.setActiveNav("addTeamBtn");
+    }, true);
     document.getElementById("closeLineModal").addEventListener("click", () =>
       document.getElementById("lineModal").classList.remove("open")
     );
@@ -93,17 +106,8 @@ const App = {
   },
 
   initTheme() {
-    // Dark is the default; only an explicit saved "light" choice turns it off.
     const saved = localStorage.getItem("7kcombo_theme");
     if (saved !== "light") document.documentElement.classList.add("dark");
-    const btn = document.getElementById("themeToggle");
-    btn.textContent = document.documentElement.classList.contains("dark") ? "☀️" : "🌙";
-    btn.addEventListener("click", () => {
-      document.documentElement.classList.toggle("dark");
-      const isDark = document.documentElement.classList.contains("dark");
-      localStorage.setItem("7kcombo_theme", isDark ? "dark" : "light");
-      btn.textContent = isDark ? "☀️" : "🌙";
-    });
   },
 
   initBanner() {
@@ -139,10 +143,7 @@ const App = {
   // again. If a team add/edit is open and unsaved, confirm first so a stray
   // click can't silently throw away in-progress work.
   exitAdminWithConfirm() {
-    const leave = () => {
-      Auth.logout();
-      this.showList();
-    };
+    const leave = () => this.showList();
     if (AdminEditor.team) {
       Modal.confirm("คุณมีการแก้ไขที่ยังไม่บันทึก ต้องการออกจากหน้าแก้ไขใช่หรือไม่?", leave);
       return;
@@ -157,13 +158,14 @@ const App = {
     document.getElementById("adminView").style.display = "block";
     AdminEditor.tab = ListView.state.tab;
     AdminEditor.renderTeamList();
-    this.toggleAdminSidebar(false);
+    this.renderSidebarOverview();
+    if (typeof ImageFolderChecker !== "undefined") ImageFolderChecker.mount();
+    this.setActiveNav("sidebarTeamsBtn");
     this.applyAdminUi();
   },
 
   showList() {
     ListView.state.tab = AdminEditor.tab;
-    this.toggleAdminSidebar(false);
     AdminEditor.closeEditor();
     document.getElementById("adminView").style.display = "none";
     document.getElementById("detailView").style.display = "none";
@@ -172,6 +174,7 @@ const App = {
     ListView.renderTabButtons();
     ListView.renderFilterPills();
     ListView.render();
+    this.setActiveNav("exitAdminBtn");
     this.applyAdminUi();
   },
 
@@ -185,25 +188,129 @@ const App = {
     this.applyAdminUi();
   },
 
+  switchSidebarTab(tabId) {
+    document.querySelectorAll(".sidebar-tab-btn").forEach((btn) => {
+      btn.classList.toggle("active", btn.dataset.sidebarTab === tabId);
+    });
+    document.querySelectorAll(".sidebar-tab-panel").forEach((panel) => {
+      panel.style.display = "none";
+    });
+    const target = document.getElementById(
+      tabId === "actions" ? "sidebarTabActions" : "sidebarTabTools"
+    );
+    if (target) target.style.display = "";
+    if (tabId === "tools") this.renderSidebarTools();
+  },
+
+  renderSidebarTools() {
+    const container = document.getElementById("sidebarToolsContent");
+    if (!container) return;
+    const today = new Date();
+    const todayLabel = today.toLocaleDateString("th-TH", {
+      weekday: "short", day: "numeric", month: "short", year: "numeric",
+    });
+    const code = typeof getDailyCode === "function" ? getDailyCode(0) : "—";
+    const staticCodes = typeof GUILD_CODES !== "undefined" ? GUILD_CODES.join(" · ") : "";
+    container.innerHTML = `
+      <div class="sidebar-tools-title">🗓️ รหัสสมาชิกประจำวัน</div>
+      <div class="sidebar-tools-code-box">
+        <div class="sidebar-tools-date">${todayLabel}</div>
+        <div class="sidebar-tools-code" id="sidebarTodayCode">${code}</div>
+        <div class="admin-sidebar-actions">
+          <button class="btn btn-primary" id="sidebarCopyCodeBtn">📋 คัดลอกรหัส</button>
+          <button class="btn" id="sidebarLineBtn">💬 สร้างข้อความ LINE</button>
+        </div>
+      </div>
+      ${staticCodes ? `<div class="sidebar-tools-static"><b>รหัสสำรอง:</b><br/><code>${staticCodes}</code></div>` : ""}
+    `;
+    document.getElementById("sidebarCopyCodeBtn").addEventListener("click", () => {
+      navigator.clipboard.writeText(code).then(() => toast("คัดลอกรหัสแล้ว"));
+    });
+    document.getElementById("sidebarLineBtn").addEventListener("click", () => {
+      const msg =
+        `🛡️ PokkyRebirth Guild War Hub\n` +
+        `📅 ${todayLabel}\n` +
+        `🔑 รหัสสมาชิก: ${code}\n\n` +
+        `นำรหัสนี้ไปกรอกที่หน้าเว็บเพื่อเข้าดูทีมที่แนะนำ\n` +
+        `⚠️ รหัสนี้ใช้ได้เฉพาะวันนี้เท่านั้น`;
+      document.getElementById("lineText").textContent = msg;
+      document.getElementById("lineModal").classList.add("open");
+    });
+  },
+
+  setActiveNav(id) {
+    document.querySelectorAll(".admin-nav-item").forEach((el) => {
+      el.classList.toggle("active", el.id === id);
+    });
+  },
+
+  focusAdminTeams() {
+    this.setActiveNav("sidebarTeamsBtn");
+    const list = document.getElementById("adminTeamList");
+    if (!list) return;
+    list.scrollIntoView({ behavior: "smooth", block: "start" });
+  },
+  renderSidebarOverview() {
+    const container = document.getElementById("sidebarOverviewContent");
+    if (!container) return;
+
+    const teams = typeof Store?.getTeams === "function" ? Store.getTeams() : [];
+    const currentTab = AdminEditor?.tab || "attack";
+    const tabLabel = (typeof TEAM_TABS !== "undefined"
+      ? TEAM_TABS.find((tab) => tab.id === currentTab)?.label
+      : "") || currentTab;
+    const visibleTeams = teams.filter((team) => !team.hidden).length;
+    const hiddenTeams = teams.length - visibleTeams;
+    const counterCount = teams.reduce((sum, team) => sum + ((team.counters || []).length), 0);
+
+    container.innerHTML = `
+      <div class="sidebar-overview-grid">
+        <div class="sidebar-stat">
+          <span>ทีมทั้งหมด</span>
+          <b>${teams.length}</b>
+        </div>
+        <div class="sidebar-stat">
+          <span>แสดงอยู่</span>
+          <b>${visibleTeams}</b>
+        </div>
+        <div class="sidebar-stat">
+          <span>ซ่อนไว้</span>
+          <b>${hiddenTeams}</b>
+        </div>
+        <div class="sidebar-stat">
+          <span>ทีมแก้</span>
+          <b>${counterCount}</b>
+        </div>
+      </div>
+      <div class="admin-sidebar-meta">หมวดที่กำลังแก้: ${tabLabel}</div>
+    `;
+
+    const summary = document.getElementById("sidebarTeamSummary");
+    if (summary) {
+      summary.textContent = `${teams.length} ทีมทั้งหมด · ${visibleTeams} ทีมที่แสดง`;
+    }
+  },
+
   toggleAdminSidebar(forceOpen) {
-    const adminView = document.getElementById("adminView");
-    const toggle = document.getElementById("adminSidebarToggle");
     const sidebar = document.getElementById("adminSidebar");
-    if (!adminView || !toggle || !sidebar) return;
+    const toggle = document.getElementById("adminSidebarToggle");
+    if (!sidebar || !toggle) return;
 
     const willOpen = typeof forceOpen === "boolean"
       ? forceOpen
-      : !adminView.classList.contains("admin-sidebar-open");
+      : !document.body.classList.contains("admin-sidebar-open");
 
-    adminView.classList.toggle("admin-sidebar-open", willOpen);
-    toggle.setAttribute("aria-expanded", String(willOpen));
+    document.body.classList.toggle("admin-sidebar-open", willOpen);
     sidebar.setAttribute("aria-hidden", String(!willOpen));
+    toggle.setAttribute("aria-expanded", String(willOpen));
   },
 
   applyAdminUi() {
-    const inAdmin = document.getElementById("adminView").style.display !== "none";
-    document.getElementById("editToggle").classList.toggle("active", inAdmin);
-    document.getElementById("toolsToggle").style.display = Auth.isAdmin() ? "" : "none";
+    const isAdmin = Auth.isAdmin();
+    const sidebar = document.getElementById("adminSidebar");
+    if (sidebar) sidebar.style.display = isAdmin ? "" : "none";
+    document.getElementById("adminSidebarToggle").style.display = isAdmin ? "" : "none";
+    document.getElementById("editToggle").style.display = "none";
   },
 
   startPolling() {

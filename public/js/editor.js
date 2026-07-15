@@ -203,8 +203,10 @@ const AdminEditor = {
     );
 
     const isDefense = this.tab === "defense";
-    document.getElementById("addTeamBtn").textContent =
-      isDefense ? "+ เพิ่มทีมป้องกันบ้านใหม่" : "+ เพิ่มทีมศัตรูใหม่";
+    const addTeamLabel = document.querySelector("#addTeamBtn span");
+    if (addTeamLabel) {
+      addTeamLabel.textContent = isDefense ? "3. เพิ่มทีมป้องกันบ้าน" : "3. เพิ่มทีม";
+    }
     const hintEl = document.getElementById("adminHint");
     if (hintEl) hintEl.textContent = isDefense
       ? "บันทึกข้อมูลทีมป้องกันบ้านอัตโนมัติในเบราว์เซอร์ กด \"ส่งออก (Export) JSON\" เพื่อบันทึกเป็นไฟล์ data/teams.json สำหรับอัปโหลดขึ้นเว็บ"

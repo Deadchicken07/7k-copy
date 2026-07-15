@@ -3,7 +3,7 @@
 const ROLE_COOKIE = "7k_role";
 // MOCK: set "admin" or "user" to simulate a role without a real cookie.
 // Remove (or set to null) when the real cookie is live.
-const MOCK_ROLE   = "user";
+const MOCK_ROLE   = "admin";
 
 function _readRoleCookie() {
   const match = document.cookie.split("; ").find((r) => r.startsWith(ROLE_COOKIE + "="));

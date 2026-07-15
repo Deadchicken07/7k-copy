@@ -6,7 +6,8 @@
   <script>
     (function () {
       var workerOrigin = "https://guild-auth-worker.deadchicken07.workers.dev";
-      if (location.origin !== workerOrigin) {
+      var isLocal = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+      if (!isLocal && location.origin !== workerOrigin) {
         location.replace(workerOrigin + location.pathname + location.search + location.hash);
       }
     })();
@@ -25,17 +26,65 @@
 <body>
   <div class="app-shell">
     <header class="site-header">
+      <button class="icon-btn admin-hamburger-header" id="adminSidebarToggle" title="Admin Menu" aria-label="Toggle admin menu" aria-expanded="false" style="display:none;">
+        <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
       <div class="brand">
         <img src="public/images/Logo.png" alt="logo" />
         <span class="brand-title">PokkyRebirth Guild War Hub</span>
       </div>
       <div class="header-actions">
-        <button class="icon-btn" id="themeToggle" title="สลับธีมมืด/สว่าง">🌙</button>
-        <button class="icon-btn" id="toolsToggle" title="Admin Tools" style="display:none;">🔧</button>
-        <button class="icon-btn" id="editToggle" title="โหมดแก้ไข">✏️</button>
+        <button class="icon-btn" id="editToggle" title="โหมดแก้ไข" style="display:none;">✏️</button>
         <a class="icon-btn" id="discordLogoutBtn" href="/auth/logout" title="ออกจากระบบ Discord" style="display:none;"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg></a>
       </div>
     </header>
+
+    <!-- GLOBAL ADMIN SIDEBAR (visible on all views for admin) -->
+    <aside class="admin-sidebar" id="adminSidebar" aria-hidden="true" style="display:none;">
+      <div class="admin-sidebar-profile">
+        <div class="admin-avatar">7K</div>
+        <div>
+          <div class="admin-sidebar-name">Guild War Hub</div>
+          <div class="admin-sidebar-role">Admin panel</div>
+        </div>
+      </div>
+
+      <label class="admin-sidebar-search">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+        <input type="text" placeholder="Search..." readonly>
+      </label>
+
+      <nav class="admin-sidebar-nav" aria-label="Admin menu">
+        <button class="admin-nav-item active" id="exitAdminBtn" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11.5 12 4l9 7.5"/><path d="M5 10v10h14V10"/><path d="M10 20v-6h4v6"/></svg>
+          <span>หน้าหลัก</span>
+        </button>
+        <button class="admin-nav-item" id="sidebarTeamsBtn" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19V9"/><path d="M10 19V5"/><path d="M16 19v-8"/><path d="M22 19H2"/></svg>
+          <span>ทีมที่ดึงเข้ามา</span>
+        </button>
+        <button class="admin-nav-item admin-nav-add" id="addTeamBtn" type="button">
+          <span>+ เพิ่มทีมศัตรูใหม่</span>
+        </button>
+        <button class="admin-nav-item" id="importBtn" type="button">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M12 8v8"/><path d="M8 12l4 4 4-4"/></svg>
+          <span>นำเข้า JSON</span>
+        </button>
+        <input type="file" id="importFile" accept="application/json" style="display:none;" />
+        <div class="admin-nav-item admin-nav-static">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 13h6V4H4z"/><path d="M14 20h6V4h-6z"/><path d="M4 20h6v-3H4z"/></svg>
+          <span>ภาพรวมระบบ</span>
+        </div>
+      </nav>
+
+      <div class="admin-sidebar-meta" id="sidebarTeamSummary"></div>
+      <div id="sidebarOverviewContent" class="sidebar-overview-content"></div>
+
+      <div style="display:none;">
+        <button id="exportBtn"></button>
+        <button id="publishBtn"></button>
+      </div>
+    </aside>
 
     <div class="update-notif-banner" id="updateNotifBanner" style="display:none;">
       <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
@@ -44,76 +93,55 @@
       <button class="update-notif-close" onclick="document.getElementById('updateNotifBanner').style.display='none'">×</button>
     </div>
 
-    <!-- GATE VIEW -->
-    <section id="gateView" style="display:none;">
-      <div class="gate-box">
-        <svg class="gate-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-          <rect x="3" y="11" width="18" height="11" rx="2"/>
-          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
-        </svg>
-        <div class="gate-title">PokkyRebirth &amp;<br>Guild War Hub</div>
-        <p class="gate-desc">ระบบวางแผนทีม Guild War<br>สำหรับสมาชิกกิลด์เท่านั้น</p>
-        <button class="btn btn-primary gate-login-btn" id="gateLoginBtn" type="button">เข้าสู่ระบบด้วย Discord</button>
-        <div id="gateAuthError" class="gate-auth-error" style="display:none;"></div>
-      </div>
-    </section>
+    <!-- PAGE CONTENT (shifts when sidebar opens) -->
+    <div class="page-content">
 
-    <!-- LIST VIEW -->
-    <section id="listView" style="display:none;">
-      <div id="mainTabs" class="main-tabs"></div>
-      <div class="search-bar">
-        <span class="search-icon">🔍</span>
-        <input type="text" id="searchInput" placeholder="ค้นหาทีมศัตรู... เช่น ชื่อตัวละครในทีม" />
-      </div>
-
-      <div class="filter-row">
-        <span class="filter-label">ประเภททีม</span>
-        <span class="filter-count" id="filterCount">ทั้งหมด 0 รายการ</span>
-      </div>
-      <div class="filter-pills" id="filterPills"></div>
-
-      <div id="teamGrid" class="team-grid"></div>
-      <div id="emptyState" class="empty-state" style="display:none;">ยังไม่มีข้อมูลทีม ลองเปลี่ยนคำค้นหรือหมวดหมู่ดู</div>
-    </section>
-
-    <!-- DETAIL VIEW -->
-    <section id="detailView" style="display:none;"></section>
-
-    <!-- TOOLS VIEW -->
-    <section id="toolsView" style="display:none;"></section>
-
-    <!-- ADMIN VIEW -->
-    <section id="adminView" style="display:none;">
-      <button class="admin-sidebar-toggle" id="adminSidebarToggle" type="button" aria-label="Toggle admin menu" aria-expanded="false">
-        <span></span><span></span><span></span>
-      </button>
-      <div class="admin-layout">
-        <aside class="admin-sidebar" id="adminSidebar" aria-hidden="true">
-          <div class="admin-sidebar-title">Admin Menu</div>
-          <div class="admin-sidebar-actions">
-      <div class="admin-bar">
-        <span class="admin-title">โหมดแก้ไข (Admin)</span>
-        <div class="btn-group">
-          <button class="btn" id="exitAdminBtn">← กลับหน้าหลัก</button>
-          <button class="btn" id="importBtn">นำเข้า (Import) JSON</button>
-          <input type="file" id="importFile" accept="application/json" style="display:none;" />
-          <button class="btn" id="exportBtn">ส่งออก (Export) JSON</button>
-          <button class="btn btn-primary" id="addTeamBtn">+ เพิ่มทีมศัตรูใหม่</button>
-          <button class="btn btn-publish" id="publishBtn">
-            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.3"/></svg>
-            ยืนยันการบันทึกข้อมูลทั้งหมด
-          </button>
+      <!-- GATE VIEW -->
+      <section id="gateView" style="display:none;">
+        <div class="gate-box">
+          <svg class="gate-lock-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="3" y="11" width="18" height="11" rx="2"/>
+            <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+          </svg>
+          <div class="gate-title">PokkyRebirth &amp;<br>Guild War Hub</div>
+          <p class="gate-desc">ระบบวางแผนทีม Guild War<br>สำหรับสมาชิกกิลด์เท่านั้น</p>
+          <button class="btn btn-primary gate-login-btn" id="gateLoginBtn" type="button">เข้าสู่ระบบด้วย Discord</button>
+          <div id="gateAuthError" class="gate-auth-error" style="display:none;"></div>
         </div>
-      </div>
-          </div>
-        </aside>
-        <div class="admin-main">
-      <p class="hint" id="adminHint">ข้อมูลที่แก้ไขจะถูกบันทึกอัตโนมัติเป็นฉบับร่างในเบราว์เซอร์นี้ กด "ยืนยันการบันทึกข้อมูลทั้งหมด" เพื่อเผยแพร่ขึ้นเว็บจริงทันที</p>
-      <div id="adminTeamList" class="admin-team-list"></div>
-      <div id="editorPanel"></div>
+      </section>
+
+      <!-- LIST VIEW -->
+      <section id="listView" style="display:none;">
+        <div id="mainTabs" class="main-tabs"></div>
+        <div class="search-bar">
+          <span class="search-icon">🔍</span>
+          <input type="text" id="searchInput" placeholder="ค้นหาทีมศัตรู... เช่น ชื่อตัวละครในทีม" />
         </div>
-      </div>
-    </section>
+
+        <div class="filter-row">
+          <span class="filter-label">ประเภททีม</span>
+          <span class="filter-count" id="filterCount">ทั้งหมด 0 รายการ</span>
+        </div>
+        <div class="filter-pills" id="filterPills"></div>
+
+        <div id="teamGrid" class="team-grid"></div>
+        <div id="emptyState" class="empty-state" style="display:none;">ยังไม่มีข้อมูลทีม ลองเปลี่ยนคำค้นหรือหมวดหมู่ดู</div>
+      </section>
+
+      <!-- DETAIL VIEW -->
+      <section id="detailView" style="display:none;"></section>
+
+      <!-- TOOLS VIEW -->
+      <section id="toolsView" style="display:none;"></section>
+
+      <!-- ADMIN VIEW (team list + editor only, no sidebar) -->
+      <section id="adminView" style="display:none;">
+        <p class="hint" id="adminHint">ข้อมูลที่แก้ไขจะถูกบันทึกอัตโนมัติเป็นฉบับร่างในเบราว์เซอร์นี้</p>
+        <div id="adminTeamList" class="admin-team-list"></div>
+        <div id="editorPanel"></div>
+      </section>
+
+    </div><!-- /.page-content -->
   </div>
 
   <div class="modal-overlay" id="counterDetailModal">
@@ -129,7 +157,6 @@
       </div>
     </div>
   </div>
-
 
   <div class="modal-overlay" id="lineModal">
     <div class="modal-box">
@@ -187,6 +214,7 @@
   <script src="js/auth.js"></script>
   <script src="js/list-view.js"></script>
   <script src="js/editor.js"></script>
+  <script src="js/image-checker.js"></script>
   <script src="js/tools.js"></script>
   <script src="js/app.js"></script>
   <script>

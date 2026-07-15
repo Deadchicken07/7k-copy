@@ -1,7 +1,19 @@
 {
-  "scripts": {
-    "build": "node scripts/build-vercel.mjs",
-    "dev": "node server.mjs"
-  },
-  "devDependencies": {}
+    "scripts":  {
+                    "dev":  "npm run dev:cloudflare",
+                    "build":  "next build",
+                    "start":  "next start",
+                    "lint":  "next lint",
+                    "dev:next":  "next dev",
+                    "dev:cloudflare":  "npm run build \u0026\u0026 wrangler pages dev out --compatibility-date=2024-01-01",
+                    "preview:cloudflare":  "wrangler pages dev out --compatibility-date=2024-01-01"
+                },
+    "dependencies":  {
+                         "next":  "^16.2.10",
+                         "react":  "^19.2.7",
+                         "react-dom":  "^19.2.7"
+                     },
+    "devDependencies":  {
+                            "wrangler":  "^4.110.0"
+                        }
 }
